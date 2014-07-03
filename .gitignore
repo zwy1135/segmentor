@@ -58,6 +58,7 @@ data/
 objdata/
 seg/
 testing/
+result/
 
 
 # =========================
