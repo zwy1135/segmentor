@@ -17,11 +17,11 @@ def moveFile(src,des):
 def getMaps(objPath = './objdata',
             fieldPath = './feature',
             config = './config/config.conf',
-            field = 'normals'):
+            field = 'c0-g-k1,c0-g-k2,H0,K0,SI0,lC0,DLP0'):
     objlist = os.listdir(objPath)
     for filename in objlist:
         fullFilename = os.path.join(objPath,filename)        
-        mapping(fullFilename,config)
+        mapping(fullFilename,config,field)
     srcFile = os.path.join(objPath,'*.map')
     moveFile(srcFile,fieldPath)
     
