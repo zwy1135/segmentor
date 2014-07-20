@@ -59,7 +59,7 @@ objdata/
 seg/
 testing/
 result/
-
+*.svm
 
 # =========================
 # Operating System Files

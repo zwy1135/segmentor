@@ -26,5 +26,5 @@ def getMaps(objPath = './objdata',
     moveFile(srcFile,fieldPath)
     
 if __name__=='__main__':
-    getMaps()
+    getMaps('./testing')
     
