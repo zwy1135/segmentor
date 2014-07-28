@@ -11,6 +11,8 @@ import numpy as np
 import os
 import cPickle
 
+featureIndex = [1,2,4,7,11]
+
 if __name__ == '__main__':
     if 'classifier.svm' in os.listdir('./'):
         print 'No needed for training'
@@ -20,6 +22,10 @@ if __name__ == '__main__':
     else:
         classifier = svm.SVC()
         data,label = dataAndLabel()
+        data = data.T[featureIndex].T
+        data[data == np.inf] = 1
+        data[data == -np.inf] = -1
+        data[np.isnan(data)] = 0
         print 'Training classifier.'
         classifier.fit(data,label)
         print 'Trained classifier.'
@@ -29,7 +35,11 @@ if __name__ == '__main__':
     testings = getFeatureOfFace(faceMapping('./testing'))
     for k in testings:
         print 'classifying %s'%k
-        result = classifier.predict(testings[k])
+        data_k = testings[k].T[featureIndex].T
+        data_k[data_k == np.inf] = 1
+        data_k[data_k == -np.inf] = -1
+        data_k[np.isnan(data_k)] = 0
+        result = classifier.predict(data_k)
         print 'classified.'
         result = np.array(result,dtype = np.int)
         print 'saving result.'

@@ -37,27 +37,35 @@ def featureMapping(fileMap = fileMapping(featurePath)):
     
 def faceMapping(modelPath = modelPath):
     print 'Mapping face dir %s.'%modelPath
+    vertexMap = {}
     faceMap = {}
     modelList = os.listdir(modelPath)
     for m in modelList:
         key = m.strip().split('.',1)[0]
         faces = []
+        vertex = []
         for line in file(os.path.join(modelPath,m)):
             if line.startswith('v'):
-                continue
+                vertex.append(map(float,line.strip().split(' ')[-3:]))
             if line.startswith('f'):
                 faces.append(map(int,line.strip().split(' ')[-3:]))
         faces = np.array(faces)-1
+        vertex = np.array(vertex)
         faceMap[key] = faces
-    return faceMap
+        vertexMap[key] = vertex
+    return faceMap,vertexMap
     
-def getFeatureOfFace(faceMap = faceMapping(),featureMap = featureMapping()):
+def getFeatureOfFace((faceMap,vertexMap) = faceMapping(),featureMap = featureMapping()):
     print 'getting feature of face'
     faceFeature = {}
     for key in faceMap:
+        vertex = vertexMap[key]
         faces = faceMap[key]
         feature = featureMap[key]
-        buf = [np.average(feature[f],axis = 0) for f in faces]
+        faceFeatureEach = np.zeros((feature.shape[0],feature.shape[1]+3))
+        faceFeatureEach[:,:3] = vertex
+        faceFeatureEach[:,3:] = feature
+        buf = [np.average(faceFeatureEach[f],axis = 0) for f in faces]
         buf = np.array(buf)
         faceFeature[key] = buf
     return faceFeature
