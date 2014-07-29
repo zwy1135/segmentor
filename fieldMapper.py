@@ -17,7 +17,7 @@ def moveFile(src,des):
 def getMaps(objPath = './objdata',
             fieldPath = './feature',
             config = './config/config.conf',
-            field = 'c0-g-k1,c0-g-k2,H0,K0,SI0,lC0,DLP0,WM0,DI0,SIH0,SH0'):
+            field = 'c0-g-k1,c0-g-k2,H0,K0,SI0,lC0,DLP0,WM0,DI0,SIH0,SH0,vol0'):
     objlist = os.listdir(objPath)
     for filename in objlist:
         fullFilename = os.path.join(objPath,filename)        
