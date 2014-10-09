@@ -18,7 +18,7 @@ featureIndex = [1,2,4,7,11]
 
 def svmSegment():
     if 'classifier.svm' in os.listdir('./'):
-        print_function( 'No needed for training')
+        print( 'No needed for training')
         f = file('classifier.svm')
         classifier = cPickle.load(f)
         f.close()
@@ -29,28 +29,28 @@ def svmSegment():
         data[data == np.inf] = 1
         data[data == -np.inf] = -1
         data[np.isnan(data)] = 0
-        print_function( 'Training classifier.')
+        print( 'Training classifier.')
         classifier.fit(data,label)
-        print_function( 'Trained classifier.')
+        print( 'Trained classifier.')
         f = file('classifier.svm','w')
         cPickle.dump(classifier,f)
         f.close()
     testings = getFeatureOfFace(faceMapping('./testing'))
     for k in testings:
-        print_function( 'classifying %s'%k)
+        print( 'classifying %s'%k)
         data_k = testings[k].T[featureIndex].T
         data_k[data_k == np.inf] = 1
         data_k[data_k == -np.inf] = -1
         data_k[np.isnan(data_k)] = 0
         result = classifier.predict(data_k)
-        print_function( 'classified.')
+        print( 'classified.')
         result = np.array(result,dtype = np.int)
-        print_function( 'saving result.')
+        print( 'saving result.')
         np.savetxt('./result/%s.seg'%k,result,fmt='%d')
         
 def treeSegment():
     if "tree" in os.listdir("./"):
-        print_function( "No need to train")
+        print( "No need to train")
         with open("tree") as f:
             classifier = cPickle.load(f)
     else:
@@ -60,23 +60,23 @@ def treeSegment():
         data[data == np.inf] = 1
         data[data == -np.inf] = -1
         data[np.isnan(data)] = 0
-        print_function( "training classifier")
+        print( "training classifier")
         classifier.fit(data,label)
-        print_function( "Saving result.")
+        print( "Saving result.")
         with open("tree","w") as f:
             cPickle.dump(classifier,f)
             
     testings = getFeatureOfFace(faceMapping('./testing'))
     for k in testings:
-        print_function( 'classifying %s'%k)
+        print( 'classifying %s'%k)
         data_k = testings[k].T[featureIndex].T
         data_k[data_k == np.inf] = 1
         data_k[data_k == -np.inf] = -1
         data_k[np.isnan(data_k)] = 0
         result = classifier.predict(data_k)
-        print_function( 'classified.')
+        print( 'classified.')
         result = np.array(result,dtype = np.int)
-        print_function( 'saving result.')
+        print( 'saving result.')
         np.savetxt('./result_tree/%s.seg'%k,result,fmt='%d')
         
 def svmBiSegmentor():
@@ -84,7 +84,7 @@ def svmBiSegmentor():
     Train svm for each label,classify it then merge result
     """
     if 'biclassifier.svm' in os.listdir('./'):
-        print_function( "No need for training.")
+        print( "No need for training.")
         with open('biclassifier.svm') as f:
             biclassifier = cPickle.load(f)
             
@@ -102,15 +102,15 @@ def svmBiSegmentor():
             biclassifier[l] = svm.SVC()
             biLabel[l] = (label == l)
         for l in biclassifier:
-            print_function( "training,using label %s."%str(l))
+            print( "training,using label %s."%str(l))
             biclassifier[l].fit(data,biLabel[l])
-            print_function( "done")
+            print( "done")
         with open('biclassifier.svm','w') as f:
             cPickle.dump(biclassifier,f)
     
     testings = getFeatureOfFace(faceMapping('./testing'))
     for k in testings:
-        print_function( "start classifying %s."%k)
+        print( "start classifying %s."%k)
         data_k = testings[k].T[featureIndex].T
         data_k[data_k == np.inf] = 1
         data_k[data_k == -np.inf] = -1
@@ -118,9 +118,9 @@ def svmBiSegmentor():
         resTmp = {}
         shape = 0
         for l in biclassifier:
-            print_function( "classifying,using label %s."%str(l))
+            print( "classifying,using label %s."%str(l))
             resTmp[l] = np.array(biclassifier[l].predict(data_k),dtype = np.bool)
-            print_function( "done.")
+            print( "done.")
             shape = resTmp[l].shape
         result = np.zeros(shape)
         for l in resTmp:

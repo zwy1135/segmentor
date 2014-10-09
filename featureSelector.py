@@ -38,7 +38,7 @@ def treeSelect():
     return featureIndex
     
 if __name__ == "__main__":
-    print_function(treeSelect())
+    print(treeSelect())
     
     
     

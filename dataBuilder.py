@@ -17,7 +17,7 @@ featurePath = './feature'
 labelPath = './seg'
 
 def fileMapping(path):
-    print_function('Mapping dir %s.'%path)
+    print('Mapping dir %s.'%path)
     fileMap = {}    
     
     filelist = os.listdir(path)
@@ -31,7 +31,7 @@ def fileMapping(path):
     return fileMap
     
 def featureMapping(fileMap = fileMapping(featurePath)):
-    print_function('Mapping feature.')
+    print('Mapping feature.')
     features = {}
     for key in fileMap.keys():
         feature = [np.loadtxt(f) for f in fileMap[key]]
@@ -39,7 +39,7 @@ def featureMapping(fileMap = fileMapping(featurePath)):
     return features
     
 def faceMapping(modelPath = modelPath):
-    print_function('Mapping face dir %s.'%modelPath)
+    print('Mapping face dir %s.'%modelPath)
     vertexMap = {}
     faceMap = {}
     modelList = os.listdir(modelPath)
@@ -59,7 +59,7 @@ def faceMapping(modelPath = modelPath):
     return faceMap,vertexMap
     
 def getFeatureOfFace((faceMap,vertexMap) = faceMapping(),featureMap = featureMapping()):
-    print_function('getting feature of face')
+    print('getting feature of face')
     faceFeature = {}
     for key in faceMap:
         vertex = vertexMap[key]
@@ -74,7 +74,7 @@ def getFeatureOfFace((faceMap,vertexMap) = faceMapping(),featureMap = featureMap
     return faceFeature
     
 def labelMapping(labelPath = labelPath):
-    print_function('Mapping labels dir %s.'%labelPath)
+    print('Mapping labels dir %s.'%labelPath)
     fileList = os.listdir(labelPath)
     labelMap = {}
     for f in fileList:
@@ -84,7 +84,7 @@ def labelMapping(labelPath = labelPath):
     return labelMap
     
 def dataAndLabel(faceFeature = getFeatureOfFace(),labelMap = labelMapping()):
-    print_function('Getting data and label.')
+    print('Getting data and label.')
     keys = labelMap.keys()
     data = []
     label = []
@@ -103,7 +103,7 @@ def dataAndLabel(faceFeature = getFeatureOfFace(),labelMap = labelMapping()):
     
 if __name__ == '__main__':
     data,label = dataAndLabel()
-    print_function(data,label)
-    print_function(len(data),len(label))
+    print(data,label)
+    print(len(data),len(label))
     
 

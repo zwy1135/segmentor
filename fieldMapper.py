@@ -14,7 +14,7 @@ from interfaces import mapping
 
 def moveFile(src,des):
     usage = 'mv %s %s'%(src,des)
-    print_function('moving : %s'%usage)
+    print('moving : %s'%usage)
     os.system(usage)
 
 def getMaps(objPath = './objdata',

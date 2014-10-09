@@ -23,7 +23,7 @@ def convert(meshIn,meshOut,option=''):
   Usage: msh2msh fnMeshIn fnMeshOut [options]
     '''
     usage = '%s %s %s %s'%(msh2msh,meshIn,meshOut,option)
-    print_function('doing:%s'%usage)
+    print('doing:%s'%usage)
     os.system(usage)
     
 def view(mesh,seg):
@@ -32,7 +32,7 @@ def view(mesh,seg):
      Usage: mshview fnMesh [-seg fnSeg] [options]
     '''
     usage = mshview+' '+mesh+' '+seg
-    print_function('doing:%s'%usage)
+    print('doing:%s'%usage)
     os.system(usage)
     
 def mapping(fileIn,
@@ -45,7 +45,7 @@ def mapping(fileIn,
 
     '''
     usage = '%s %s %s %s'%(generateMaps,config,fileIn,field)
-    print_function('doing : %s'%usage)
+    print('doing : %s'%usage)
     os.system(usage)
 
 

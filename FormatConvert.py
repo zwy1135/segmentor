@@ -10,7 +10,7 @@ import os
 
 def off2obj(meshIn,meshOut):
     usage = 'python off2obj.py %s %s'%(meshIn,meshOut)
-    print_function('doing: %s'%usage)
+    print('doing: %s'%usage)
     os.system(usage)
   
 
