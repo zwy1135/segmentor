@@ -6,12 +6,13 @@ Created on Sun Jun  1 15:37:37 2014
 """
 
 import os
+from __future__ import print_function
 
 from interfaces import mapping
 
 def moveFile(src,des):
     usage = 'mv %s %s'%(src,des)
-    print 'moving : %s'%usage
+    print_function('moving : %s'%usage)
     os.system(usage)
 
 def getMaps(objPath = './objdata',

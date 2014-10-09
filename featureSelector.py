@@ -4,6 +4,7 @@ Created on Fri Jul 25 22:23:01 2014
 
 @author: zeng
 """
+from __future__ import print_function
 
 from sklearn.feature_selection import SelectKBest,f_classif
 from sklearn.ensemble import ExtraTreesClassifier
@@ -37,7 +38,7 @@ def treeSelect():
     return featureIndex
     
 if __name__ == "__main__":
-    print treeSelect()
+    print_function(treeSelect())
     
     
     

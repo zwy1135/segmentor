@@ -5,9 +5,11 @@ Created on Sun Jun  1 10:47:57 2014
 @author: zeng
 """
 import os
+from __future__ import print_function
+
 def off2obj(meshIn,meshOut):
     usage = 'python off2obj.py %s %s'%(meshIn,meshOut)
-    print 'doing: %s'%usage
+    print_function('doing: %s'%usage)
     os.system(usage)
   
 
