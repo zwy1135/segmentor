@@ -4,8 +4,9 @@ Created on Wed Jul 02 19:58:54 2014
 
 @author: wy
 """
-import os
 from __future__ import print_function
+import os
+
 
 import numpy as np
 

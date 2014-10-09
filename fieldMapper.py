@@ -1,12 +1,14 @@
+
 # -*- coding: utf-8 -*-
+
 """
 Created on Sun Jun  1 15:37:37 2014
 
 @author: zeng
 """
-
-import os
 from __future__ import print_function
+import os
+
 
 from interfaces import mapping
 

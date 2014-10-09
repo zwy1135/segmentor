@@ -1,6 +1,6 @@
-
-import os
 from __future__ import print_function
+import os
+
 
 appPath = '~/ms/MeshsegBenchmark-1.0/exe'
 descriptorPath = '~/ms/descriptormap/bin'

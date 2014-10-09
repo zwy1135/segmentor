@@ -4,9 +4,10 @@ Created on Wed Jul 02 21:13:17 2014
 
 @author: wy
 """
+from __future__ import print_function
 import os
 import cPickle
-from __future__ import print_function
+
 
 from sklearn import svm
 from dataBuilder import *

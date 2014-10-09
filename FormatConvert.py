@@ -4,8 +4,9 @@ Created on Sun Jun  1 10:47:57 2014
 
 @author: zeng
 """
-import os
 from __future__ import print_function
+import os
+
 
 def off2obj(meshIn,meshOut):
     usage = 'python off2obj.py %s %s'%(meshIn,meshOut)
