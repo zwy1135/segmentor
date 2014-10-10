@@ -47,19 +47,21 @@ def faceMapping(modelPath = modelPath):
         key = m.strip().split('.',1)[0]
         faces = []
         vertex = []
-        for line in file(os.path.join(modelPath,m)):
-            if line.startswith('v'):
-                vertex.append(map(float,line.strip().split(' ')[-3:]))
-            if line.startswith('f'):
-                faces.append(map(int,line.strip().split(' ')[-3:]))
+        with open(os.path.join(modelPath,m)) as f:
+            for line in f:
+                if line.startswith('v'):
+                    vertex.append(list(map(float,line.strip().split(' ')[-3:])))
+                if line.startswith('f'):
+                    faces.append(list(map(int,line.strip().split(' ')[-3:])))
         faces = np.array(faces)-1
         vertex = np.array(vertex)
         faceMap[key] = faces
         vertexMap[key] = vertex
     return faceMap,vertexMap
     
-def getFeatureOfFace((faceMap,vertexMap) = faceMapping(),featureMap = featureMapping()):
+def getFeatureOfFace(fv = faceMapping(),featureMap = featureMapping()):
     print('getting feature of face')
+    (faceMap,vertexMap) = fv
     faceFeature = {}
     for key in faceMap:
         vertex = vertexMap[key]

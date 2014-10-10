@@ -6,7 +6,7 @@ Created on Wed Jul 02 21:13:17 2014
 """
 from __future__ import print_function
 import os
-import cPickle
+import pickle
 
 
 from sklearn import svm
@@ -20,7 +20,7 @@ def svmSegment():
     if 'classifier.svm' in os.listdir('./'):
         print( 'No needed for training')
         f = file('classifier.svm')
-        classifier = cPickle.load(f)
+        classifier = pickle.load(f)
         f.close()
     else:
         classifier = svm.SVC()
@@ -33,7 +33,7 @@ def svmSegment():
         classifier.fit(data,label)
         print( 'Trained classifier.')
         f = file('classifier.svm','w')
-        cPickle.dump(classifier,f)
+        pickle.dump(classifier,f)
         f.close()
     testings = getFeatureOfFace(faceMapping('./testing'))
     for k in testings:
@@ -52,7 +52,7 @@ def treeSegment():
     if "tree" in os.listdir("./"):
         print( "No need to train")
         with open("tree") as f:
-            classifier = cPickle.load(f)
+            classifier = pickle.load(f)
     else:
         classifier = ExtraTreesClassifier(n_estimators=15,max_features = None)
         data,label = dataAndLabel()
@@ -64,7 +64,7 @@ def treeSegment():
         classifier.fit(data,label)
         print( "Saving result.")
         with open("tree","w") as f:
-            cPickle.dump(classifier,f)
+            pickle.dump(classifier,f)
             
     testings = getFeatureOfFace(faceMapping('./testing'))
     for k in testings:
@@ -86,7 +86,7 @@ def svmBiSegmentor():
     if 'biclassifier.svm' in os.listdir('./'):
         print( "No need for training.")
         with open('biclassifier.svm') as f:
-            biclassifier = cPickle.load(f)
+            biclassifier = pickle.load(f)
             
     else:
         biclassifier = {}
@@ -106,7 +106,7 @@ def svmBiSegmentor():
             biclassifier[l].fit(data,biLabel[l])
             print( "done")
         with open('biclassifier.svm','w') as f:
-            cPickle.dump(biclassifier,f)
+            pickle.dump(biclassifier,f)
     
     testings = getFeatureOfFace(faceMapping('./testing'))
     for k in testings:
