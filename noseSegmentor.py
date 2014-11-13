@@ -12,13 +12,18 @@ import time
 
 
 import numpy as np
+#from sklearn.svm import SVC
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.preprocessing import StandardScaler
+from sklearn.feature_selection import VarianceThreshold
 from sklearn.pipeline import Pipeline
 
 from dataBuilder import *
 from graphcut import buildDiGraph,cutAndLabel
-
+#
+#class mySVC(SVC):
+#    def transform(self,X,y=None,copy=None):
+#        return X
 
 def noseSegment():
     print("started at %s"%str(time.localtime()))
@@ -29,8 +34,10 @@ def noseSegment():
             
     else:
         classifier = ExtraTreesClassifier(n_estimators=100,verbose=1,n_jobs=10)
+        #classifier = mySVC(probability=True,verbose=1)
         scaler = StandardScaler()
-        pipe = Pipeline([("scaler",scaler),("classifier",classifier)])
+        selector = VarianceThreshold(threshold = 0.85*(1-0.85))
+        pipe = Pipeline([("scaler",scaler),("selector",selector),("classifier",classifier)])
         data,label = dataAndLabel()
         data[data == np.inf] = 1
         data[data == -np.inf] = -1
@@ -60,9 +67,9 @@ def noseSegment():
         print("saving prob")
         np.savetxt("./result_prob/%s.prob"%k,proba)
         
-        DG,size = buildDiGraph(faceMap[k],pipe.transform(data_k),proba)
+        #DG,size = buildDiGraph(faceMap[k],pipe.transform(data_k),proba)
         print("cutting.")
-        result = cutAndLabel(DG,size)
+        result = cutAndLabel(faceMap[k],pipe.transform(data_k),proba)
         print( 'saving result.')
         np.savetxt('./result/%s.seg'%k,result,fmt='%d')        
     print("end at %s"%str(time.localtime()))

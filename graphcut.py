@@ -6,8 +6,11 @@ Created on Sat Oct 11 15:22:07 2014
 """
 from __future__ import print_function
 
+from copy import deepcopy
+
 import numpy as np
 import networkx as nx
+
 
 
 
@@ -18,16 +21,16 @@ def computeSimilarity(feature1,feature2):
     feature1 = np.array(feature1)
     feature2 = np.array(feature2)
     #cosine similarity
-    similarity = (sum(feature1*feature2))/((sum(feature1**2)**0.5)*(sum(feature2**2)**0.5))
+    similarity = 0.6 * ((sum(feature1*feature2))/((sum(feature1**2)**0.5)*(sum(feature2**2)**0.5))) ** 2
     #similarity = sum((feature1-feature2)**2)
     
     return similarity
     
-def computeWeight(zeroProba,oneProba):
-    zeroWeight = zeroProba / (zeroProba+oneProba)
-    oneWeight = oneProba / (zeroProba+oneProba)
+def computeWeight(trueProba):
+    falseWeight = 1 - trueProba
+    trueWeight = trueProba
     
-    return zeroWeight,oneWeight
+    return falseWeight,trueWeight
     
 def computeConectivity(faces):
     print("computing connectivity.")
@@ -56,6 +59,7 @@ def computeConectivity(faces):
     
 def buildDiGraph(faces,features,proba):
     DG = nx.DiGraph()
+    graphList = []
     
     graphSize = len(faces)+2
     source = graphSize -2
@@ -63,34 +67,43 @@ def buildDiGraph(faces,features,proba):
     
     DG.add_nodes_from(range(graphSize))
     
-    for i in range(graphSize-2):
-        zeroWeight,oneWeight = computeWeight(proba[i][0],proba[i][1])
-        DG.add_edge(source,i,weight=zeroWeight)
-        DG.add_edge(i,sink,weight = oneWeight)
-        
     conectivity = computeConectivity(faces)
     
     for u,v in conectivity:
         similarity = computeSimilarity(features[u],features[v])
         DG.add_edge(u,v,weight = similarity)
         DG.add_edge(v,u,weight = similarity)
-        
-    return DG,graphSize
     
-def cutAndLabel(graph,size):
+    
+    for label in range(1,len(proba[0])):
+        graph = deepcopy(DG)
+        for i in range(graphSize-2):
+            falseWeight,trueWeight = computeWeight(proba[i][label])
+            graph.add_edge(source,i,weight=falseWeight)
+            graph.add_edge(i,sink,weight = trueWeight)
+            
+        graphList.append(graph)
+        
+    
+        
+    return graphList,graphSize
+    
+def cutAndLabel(faces,features,proba):
+    graphList,size = buildDiGraph(faces,features,proba)    
+    
     source = size -2
     sink = size - 1
     
-    cutValue,partition = nx.minimum_cut(graph,source,sink,capacity="weight")
-    zeroIndex,oneIndex = partition
+    result = np.zeros(size-2)    
     
-    if source in zeroIndex:
-        zeroIndex.remove(source)
-    if sink in oneIndex:
-        oneIndex.remove(sink)
-    result = np.zeros(size-2)
-    result[list(zeroIndex)] = 0
-    result[list(oneIndex)] = 1
+    for i in range(len(graphList)):
+        cutValue,partition = nx.minimum_cut(graphList[i],source,sink,capacity="weight")
+        falseIndex,trueIndex = partition
+        
+        if sink in trueIndex:
+            trueIndex.remove(sink)
+        
+        result[list(trueIndex)] = i+1
     
     return result
     
