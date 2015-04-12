@@ -1,131 +1,77 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jul 02 21:13:17 2014
+Created on Sun Apr 12 20:17:22 2015
 
 @author: wy
 """
+
 from __future__ import print_function
 import os
+import time
 import pickle
 
-
-from sklearn import svm
-from dataBuilder import *
 import numpy as np
 
+from model import Model
+from model import dataPath, testPath
 
-featureIndex = [1,2,4,7,11]
+from classifier import Classifier, dumped
 
-def svmSegment():
-    if 'classifier.svm' in os.listdir('./'):
-        print( 'No needed for training')
-        f = file('classifier.svm')
-        classifier = pickle.load(f)
-        f.close()
+from graph import build_weight_graph,build_s_t_graph_list,cut_and_label
+
+
+
+def main():
+    print("started at %s"%str(time.localtime()))
+    if dumped in os.listdir():
+        with open(dumped,"rb") as f:
+            clf = pickle.load(f)
     else:
-        classifier = svm.SVC()
-        data,label = dataAndLabel()
-        data = data.T[featureIndex].T
-        data[data == np.inf] = 1
-        data[data == -np.inf] = -1
-        data[np.isnan(data)] = 0
-        print( 'Training classifier.')
-        classifier.fit(data,label)
-        print( 'Trained classifier.')
-        f = file('classifier.svm','w')
-        pickle.dump(classifier,f)
-        f.close()
-    testings = getFeatureOfFace(faceMapping('./testing'))
-    for k in testings:
-        print( 'classifying %s'%k)
-        data_k = testings[k].T[featureIndex].T
-        data_k[data_k == np.inf] = 1
-        data_k[data_k == -np.inf] = -1
-        data_k[np.isnan(data_k)] = 0
-        result = classifier.predict(data_k)
-        print( 'classified.')
-        result = np.array(result,dtype = np.int)
-        print( 'saving result.')
-        np.savetxt('./result/%s.seg'%k,result,fmt='%d')
+        clf = Classifier()
         
-def treeSegment():
-    if "tree" in os.listdir("./"):
-        print( "No need to train")
-        with open("tree") as f:
-            classifier = pickle.load(f)
-    else:
-        classifier = ExtraTreesClassifier(n_estimators=15,max_features = None)
-        data,label = dataAndLabel()
-        data = data.T[featureIndex].T
-        data[data == np.inf] = 1
-        data[data == -np.inf] = -1
-        data[np.isnan(data)] = 0
-        print( "training classifier")
-        classifier.fit(data,label)
-        print( "Saving result.")
-        with open("tree","w") as f:
-            pickle.dump(classifier,f)
-            
-    testings = getFeatureOfFace(faceMapping('./testing'))
-    for k in testings:
-        print( 'classifying %s'%k)
-        data_k = testings[k].T[featureIndex].T
-        data_k[data_k == np.inf] = 1
-        data_k[data_k == -np.inf] = -1
-        data_k[np.isnan(data_k)] = 0
-        result = classifier.predict(data_k)
-        print( 'classified.')
-        result = np.array(result,dtype = np.int)
-        print( 'saving result.')
-        np.savetxt('./result_tree/%s.seg'%k,result,fmt='%d')
+        dataNameList = os.listdir(dataPath)
         
-def svmBiSegmentor():
-    """
-    Train svm for each label,classify it then merge result
-    """
-    if 'biclassifier.svm' in os.listdir('./'):
-        print( "No need for training.")
-        with open('biclassifier.svm') as f:
-            biclassifier = pickle.load(f)
-            
-    else:
-        biclassifier = {}
-        biLabel = {}
-        data,label = dataAndLabel()
-        data = data.T[featureIndex].T
-        data[data == np.inf] = 1
-        data[data == -np.inf] = -1
-        data[np.isnan(data)] = 0
-        labelSet = set(label)
-        labelSet.remove(0)
-        for l in labelSet:
-            biclassifier[l] = svm.SVC()
-            biLabel[l] = (label == l)
-        for l in biclassifier:
-            print( "training,using label %s."%str(l))
-            biclassifier[l].fit(data,biLabel[l])
-            print( "done")
-        with open('biclassifier.svm','w') as f:
-            pickle.dump(biclassifier,f)
+        trainModels = [Model(name.split(".")[0], True) for name in dataNameList]
+
+        data = np.concatenate([m.feature for m in trainModels],axis=0)
+        label = np.concatenate([m.labels for m in trainModels],axis=0)
+        
+        data = clf.preprocess(data, True)
+        
+        clf.fit(data, label)
+        print("training time end at %s"%str(time.localtime()))
+        clf.save()
+        
+    testNameList = os.listdir(testPath)
+    testModels = [Model(name.split(".")[0]) for name in testNameList]
+    for m in testModels:
+        data = m.feature
+        data = clf.preprocess(data)
+        
+        print("compute probability.")
+        proba = clf.predict_proba(data)
+        print("saving prob")
+        np.savetxt("./result_prob/%s.prob"%m.name,proba)
+        
+        print("saving mid-res.")
+        np.savetxt("./result_mid/%s.seg"%m.name,np.argmax(proba,axis=-1),fmt="%d")
+        
+        print("cutting")
+        WG = build_weight_graph(m.faceGraph,clf.transform(data, threshold="median"))
+        gList = build_s_t_graph_list(WG, proba)
+        
+        result = cut_and_label(gList)
+        print( 'saving result.')
+        np.savetxt('./result/%s.seg'%m.name,result,fmt='%d') 
+        
+    print("end at %s"%str(time.localtime()))
     
-    testings = getFeatureOfFace(faceMapping('./testing'))
-    for k in testings:
-        print( "start classifying %s."%k)
-        data_k = testings[k].T[featureIndex].T
-        data_k[data_k == np.inf] = 1
-        data_k[data_k == -np.inf] = -1
-        data_k[np.isnan(data_k)] = 0
-        resTmp = {}
-        shape = 0
-        for l in biclassifier:
-            print( "classifying,using label %s."%str(l))
-            resTmp[l] = np.array(biclassifier[l].predict(data_k),dtype = np.bool)
-            print( "done.")
-            shape = resTmp[l].shape
-        result = np.zeros(shape)
-        for l in resTmp:
-            result[resTmp[l]] = l
-        np.savetxt("./result/%s.seg"%k,result,fmt = "%d")
-        
 if __name__=="__main__":
-    svmSegment()
+    main()
+        
+        
+    
+    
+    
+    
+
